@@ -1,4 +1,4 @@
-"""contains UI to communicate between user and application"""
+"""Contains UI to communicate between user and application"""
 from app import *
 
 

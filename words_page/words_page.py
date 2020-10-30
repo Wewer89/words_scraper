@@ -1,6 +1,7 @@
 """Contains class Word Page to handle page https://angielskie-slowka.pl/slowka-angielskie and extracts words from it."""
 import selenium
 from selenium import webdriver
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
 from typing import List
@@ -59,34 +60,24 @@ class WordsPage:
         except:
             self.load_page(category)
 
-    def click_next_page_recursively(self, category, current_page: int = 1):
+    def click_next_page(self, category):
         """click next page if available and extract words"""
+        next_page = 2
         locators = (By.CSS_SELECTOR, "ul.pagination li a")
-        urls = [elem for elem in self.driver.find_elements(*locators)[current_page:]]  # skip current page
-        for url in urls:
+        url = [e for e in self.driver.find_elements(*locators) if e.get_attribute("href")[-1] == str(next_page)]
+        while True:
             self.put_values_into_table(category)
             try:
-                url.click()
-            except selenium.common.exceptions.StaleElementReferenceException:
-                self.click_next_page_recursively(category, current_page)
-                break
-            else:
-                current_page += 1
-        """
-        locators = (By.CSS_SELECTOR, "ul.pagination li a")
-        urls = [elem for elem in self.driver.find_elements(*locators)[1:]]
-        while True:
-            index = 0
-            try:
-                self.put_values_into_table(category)
-                urls[index].click()
-            except selenium.common.exceptions.StaleElementReferenceException:
-                continue
+                url[0].click()
+            except StaleElementReferenceException:
+                # if StaleElementReferenceException then create new web element using list comprehension
+                url = [e for e in self.driver.find_elements(*locators)
+                       if e.get_attribute("href")[-1] == str(next_page)]
             except IndexError:
                 break
             else:
-                index += 1
-        """
+                next_page += 1
+
     def get_url_for_category(self) -> str:
         """get url address for current category"""
         locator = (By.CSS_SELECTOR, "ul.pagination li a")

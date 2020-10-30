@@ -45,7 +45,7 @@ def insert_words_into_table():
     category = ask_for_table_name()
     page.driver.maximize_window()
     page.load_page(category)
-    page.click_next_page_recursively(category)
+    page.click_next_page(category)
     print(f'\nWords have been added successfully to table {category!r}')
     page.back_to_home()
     page.driver.minimize_window()
