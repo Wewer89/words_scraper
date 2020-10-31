@@ -1,4 +1,5 @@
 """Contains class Word Page to handle page https://angielskie-slowka.pl/slowka-angielskie and extracts words from it."""
+import re
 import selenium
 from selenium import webdriver
 from selenium.common.exceptions import StaleElementReferenceException
@@ -29,11 +30,16 @@ class WordsPage:
             pass
 
     def fetch_categories(self) -> List[str]:
-        """return list of categories from 'https://angielskie-slowka.pl/slowka-angielskie' """
-        locator = (By.CSS_SELECTOR, "a.category strong")
-        strong_tags = self.driver.find_elements(*locator)
-        categories = [tag.text.lower() for tag in strong_tags]
-        return sorted(categories)
+        """return list of categories from https://angielskie-slowka.pl/slowka-angielskie """
+        locator = (By.CSS_SELECTOR, "a.category")
+        urls = [tag.get_attribute("href") for tag in self.driver.find_elements(*locator)]
+
+        categories = []
+        for url in urls:
+            pattern = "https:\/\/angielskie-slowka.pl\/([A-z\-]+)\,[A-z\d\,]+"
+            categories.append(re.search(pattern, url).group(1).replace("-", " "))
+
+        return categories
 
     def back_to_home(self):
         """come back to homepage 'https://angielskie-slowka.pl/slowka-angielskie' """
