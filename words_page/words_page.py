@@ -6,6 +6,9 @@ from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
 from typing import List
+
+from selenium.webdriver.remote.webelement import WebElement
+
 from data_base_manager.data_base import DataBaseManager
 
 
@@ -33,12 +36,10 @@ class WordsPage:
         """return list of categories from https://angielskie-slowka.pl/slowka-angielskie """
         locator = (By.CSS_SELECTOR, "a.category")
         urls = [tag.get_attribute("href") for tag in self.driver.find_elements(*locator)]
-
         categories = []
         for url in urls:
             pattern = "https:\/\/angielskie-slowka.pl\/([A-z\-]+)\,[A-z\d\,]+"
             categories.append(re.search(pattern, url).group(1).replace("-", " "))
-
         return categories
 
     def back_to_home(self):
@@ -66,21 +67,25 @@ class WordsPage:
         except:
             self.load_page(category)
 
+    def find_url(self, next_page: int) -> WebElement:
+        """find Webelement for next page"""
+        locator = (By.CSS_SELECTOR, "ul.pagination li a")
+        for e in self.driver.find_elements(*locator):
+            if e.get_attribute("href")[-1] == str(next_page) or e.get_attribute("href")[-2:] == str(next_page):
+                return e
+
     def click_next_page(self, category):
         """click next page if available and extract words"""
         next_page = 2
-        locators = (By.CSS_SELECTOR, "ul.pagination li a")
-        url = [e for e in self.driver.find_elements(*locators) if e.get_attribute("href")[-1] == str(next_page)]
+        url = self.find_url(next_page)
         while True:
             self.put_values_into_table(category)
             try:
-                url[0].click()
+                if url is None:
+                    break
+                url.click()
             except StaleElementReferenceException:
-                # if StaleElementReferenceException then create new web element using list comprehension
-                url = [e for e in self.driver.find_elements(*locators)
-                       if e.get_attribute("href")[-1] == str(next_page)]
-            except IndexError:
-                break
+                url = self.find_url(next_page)
             else:
                 next_page += 1
 
