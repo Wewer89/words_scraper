@@ -3,6 +3,7 @@ from app import *
 
 
 USER_CHOICES = """
+'c' - CREATE BEST SCORE TABLE
 'd' - DISPLAY ALL NAMES OF CURRENT TABLES
 'i' - INSERT WORDS INTO TABLE
 'p' - PRINT WORDS FROM GIVEN TABLE
@@ -13,6 +14,7 @@ USER_CHOICES = """
 Enter your choice: """
 
 user_choices = {
+    'c': create_best_score_table,
     'd': display_tables,
     'i': insert_words_into_table,
     'p': print_words,

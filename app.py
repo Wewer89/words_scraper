@@ -5,6 +5,13 @@ from data_base_manager.data_base import DataBaseManager
 page = WordsPage()
 
 
+def create_best_score_table():
+    """create table to record user best score"""
+    table_name = "best_score"
+    DataBaseManager.create_table_best_score(table_name)
+    print("\nTable 'best score' has been created")
+
+
 def print_categories_recursively():
     """ run 'page.fetch_categories()' and print all categories for user"""
     categories = page.fetch_categories()

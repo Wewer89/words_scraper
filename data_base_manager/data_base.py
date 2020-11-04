@@ -22,7 +22,7 @@ class DataBaseManager:
     def return_names_of_tables_in_database() -> list:
         """return names of all tables in database"""
         with DatabaseCursor() as cursor:
-            cursor.execute('SELECT name from sqlite_master where type= \'table\'')
+            cursor.execute('SELECT name FROM sqlite_master where type= \'table\'')
             return [row[0] for row in cursor.fetchall()]
 
     @staticmethod
@@ -82,3 +82,8 @@ class DataBaseManager:
         with DatabaseCursor() as cursor:
             cursor.execute(f'DROP TABLE IF EXISTS {table_name}')
 
+    @staticmethod
+    def create_table_best_score(table_name: str):
+        """create table 'best_score'"""
+        with DatabaseCursor() as cursor:
+            cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} (user_name text primary key, score integer)")
